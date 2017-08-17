@@ -27,13 +27,13 @@ try {
     // CREATE IDP
     if (isset($_POST['idpsCreate'])) {
         if ($Idps->create(
-            $_POST['name'],
-            $_POST['entityid'],
-            $_POST['ssoUrl'],
-            $_POST['ssoBinding'],
-            $_POST['sloUrl'],
-            $_POST['sloBinding'],
-            $_POST['x509']
+            $Request->request->get('name'),
+            $Request->request->get('entityid'),
+            $Request->request->get('ssoUrl'),
+            $Request->request->get('ssoBinding'),
+            $Request->request->get('sloUrl'),
+            $Request->request->get('sloBinding'),
+            $Request->request->get('x509')
         )) {
             $_SESSION['ok'][] = _('Configuration updated successfully.');
         } else {
@@ -44,14 +44,14 @@ try {
     // UPDATE IDP
     if (isset($_POST['idpsUpdate'])) {
         if ($Idps->update(
-            $_POST['id'],
-            $_POST['name'],
-            $_POST['entityid'],
-            $_POST['ssoUrl'],
-            $_POST['ssoBinding'],
-            $_POST['sloUrl'],
-            $_POST['sloBinding'],
-            $_POST['x509']
+            $Request->request->get('id'),
+            $Request->request->get('name'),
+            $Request->request->get('entityid'),
+            $Request->request->get('ssoUrl'),
+            $Request->request->get('ssoBinding'),
+            $Request->request->get('sloUrl'),
+            $Request->request->get('sloBinding'),
+            $Request->request->get('x509')
         )) {
             $_SESSION['ok'][] = _('Configuration updated successfully.');
         } else {
@@ -60,8 +60,8 @@ try {
     }
 
     // DESTROY IDP
-    if (isset($_POST['idpsDestroy'])) {
-        if ($Idps->destroy($_POST['id'])) {
+    if ($Request->request->has('idpsDestroy')) {
+        if ($Idps->destroy($Request->request->get('id'))) {
             $_SESSION['ok'][] = _('Configuration updated successfully.');
         } else {
             $_SESSION['ko'][] = _('An error occurred!');
