@@ -35,9 +35,9 @@ try {
 
         $EntityView->Entity->setId($Request->query->get('id'));
         $Comments = new Comments($EntityView->Entity);
+        $commentsArr = $Comments->read();
         $EntityView->initViewEdit();
 
-        $commentsArr = $Comments->read();
         $ownerName = '';
         if ($EntityView->isReadOnly()) {
             // we need to get the fullname of the user who owns the experiment to display the RO message

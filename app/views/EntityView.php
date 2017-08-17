@@ -59,7 +59,7 @@ class EntityView
         $this->Entity->populate();
         // throw error if the id is empty (non existing id)
         if (empty($this->Entity->entityData['userid'])) {
-            throw new Exception(Tools::error(true));
+            throw new Exception(Tools::error());
         }
 
         // get the UploadsView object
