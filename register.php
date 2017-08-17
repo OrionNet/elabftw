@@ -42,8 +42,7 @@ try {
 
     $Response = new Response();
     $Response->setContent($Twig->render('register.html', array(
-        'teamsArr' => $teamsArr,
-        'showLocal' => $showLocal
+        'teamsArr' => $teamsArr
     )));
     $Response->send();
 

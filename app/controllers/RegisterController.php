@@ -26,7 +26,7 @@ try {
     }
 
     // Stop bot registration by checking if the (invisible to humans) bot input is filled
-    if (isset($_POST['bot']) && !empty($_POST['bot'])) {
+    if (!empty($Request->request->get('bot'))) {
         throw new Exception('Only humans can register an account!');
     }
 
@@ -44,7 +44,7 @@ try {
         throw new Exception(_('A mandatory field is missing!'));
     }
 
-    //Check whether the query was successful or not
+    // Check whether the query was successful or not
     if (!$Users->create($_POST['email'], $_POST['team'], $_POST['firstname'], $_POST['lastname'], $_POST['password'])) {
         throw new Exception('Failed inserting new account in SQL!');
     }
@@ -55,7 +55,7 @@ try {
         $_SESSION['ok'][] = _('Registration successful :)<br>Welcome to eLabFTW o/');
     }
     // store the email here so we can put it in the login field
-    $_SESSION['email'] = $_POST['email'];
+    $_SESSION['email'] = $Request->request->get('email');
 
 } catch (Exception $e) {
     $_SESSION['ko'][] = $e->getMessage();

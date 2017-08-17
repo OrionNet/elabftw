@@ -21,9 +21,9 @@ try {
     // it might take some time and we don't want to be cut in the middle, so set time_limit to ∞
     set_time_limit(0);
 
-    if ($_POST['type'] === 'csv') {
+    if ($Request->request->get('type') === 'csv') {
         $Import = new ImportCsv();
-    } elseif ($_POST['type'] === 'zip') {
+    } elseif ($Request->request->get('type') === 'zip') {
         $Import = new ImportZip();
     } else {
         throw new Exception('Invalid argument');

@@ -23,45 +23,38 @@ try {
     $Auth = new Auth();
     $Saml = new Saml(new Config, new Idps);
 
-    if (isset($_POST['idp_id'])) { // login with SAML
-        $settings = $Saml->getSettings($_POST['idp_id']);
-        $auth = new OneLogin_Saml2_Auth($settings);
-        $returnUrl = $settings['baseurl'] . "/index.php?acs&idp=" . $_POST['idp_id'];
-        $auth->login($returnUrl);
+    if ($Request->request->has('idp_id')) { // login with SAML
+        $idpId = $Request->request->get('idp_id');
+        $settings = $Saml->getSettings($idpId);
+        $SamlAuth = new OneLogin_Saml2_Auth($settings);
+        $returnUrl = $settings['baseurl'] . "/index.php?acs&idp=" . $idpId;
+        $SamlAuth->login($returnUrl);
 
     } else {
 
         // FORMKEY
-        if (!isset($_POST['formkey']) || !$formKey->validate()) {
+        if (!$Request->request->has('formkey') || !$formKey->validate()) {
             throw new Exception(_("Your session expired. Please retry."));
         }
 
         // EMAIL
-        if ((!isset($_POST['email'])) || (empty($_POST['email']))) {
+        if (!$Request->request->has('email') || !$Request->request->has('password')) {
             throw new Exception(_('A mandatory field is missing!'));
         }
 
-        // PASSWORD
-        if ((!isset($_POST['password'])) || (empty($_POST['password']))) {
-            throw new Exception(_('A mandatory field is missing!'));
-        }
-
-        // this is here to avoid an "Undefined index" notice
-        if (isset($_POST['rememberme'])) {
-            $rememberme = $_POST['rememberme'];
+        if ($Request->request->has('rememberme')) {
+            $rememberme = $Request->request->get('rememberme');
         } else {
             $rememberme = 'off';
         }
 
         // the actual login
-        if ($Auth->login($_POST['email'], $_POST['password'], $rememberme)) {
-            //var_dump($_SERVER);die;
-            if (isset($_COOKIE['redirect'])) {
-                $url = $_COOKIE['redirect'];
+        if ($Auth->login($Request->request->get('email'), $Request->request->get('password'), $rememberme)) {
+            if ($Request->cookies->has('redirect')) {
+                $location = $Request->cookies->get('redirect');
             } else {
-                $url = '../../experiments.php';
+                $location = '../../experiments.php';
             }
-            //var_dump($url);die;
         } else {
             // log the attempt if the login failed
             $Logs = new Logs();
@@ -80,5 +73,5 @@ try {
     $_SESSION['ko'][] = $e->getMessage();
 
 } finally {
-    header("location: $url");
+    header("location: $location");
 }

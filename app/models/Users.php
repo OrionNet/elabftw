@@ -13,6 +13,7 @@ namespace Elabftw\Elabftw;
 use PDO;
 use Exception;
 use Swift_Message;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Users
@@ -203,6 +204,9 @@ class Users extends Auth
     {
         $Email = new Email($this->Config);
 
+        $Request = Request::createFromGlobals();
+        $url = 'https://' . $Request->getHttpHost() . '/admin.php';
+
         // Create the message
         $footer = "\n\n~~~\nSent from eLabFTW https://www.elabftw.net\n";
         $message = Swift_Message::newInstance()
@@ -213,7 +217,7 @@ class Users extends Auth
         // Set the To
         ->setTo($this->getAdminEmail($team))
         // Give it a body
-        ->setBody(_('Hi. A new user registered on elabftw. Head to the admin panel to validate the account.') . $footer);
+        ->setBody(_('Hi. A new user registered on elabftw. Head to the admin panel to validate the account: ') . $url . $footer);
         // generate Swift_Mailer instance
         $mailer = $Email->getMailer();
         // SEND EMAIL
@@ -730,22 +734,19 @@ class Users extends Auth
      */
     public function validate($userid)
     {
-        $userid = Tools::checkId($userid);
-        if ($userid === false) {
-            throw new Exception('The id parameter is not valid!');
-        }
+        $this->setId($userid);
 
         $sql = "UPDATE users SET validated = 1 WHERE userid = :userid";
         $req = $this->pdo->prepare($sql);
-
-        // we read to get email of user
-        $userArr = $this->read($userid);
-
-        $req->bindParam(':userid', $userid, PDO::PARAM_INT);
+        $req->bindParam(':userid', $this->userid);
 
         // validate the user
         if ($req->execute()) {
-            $msg = _('Validated user with ID :') . ' ' . $userid;
+            $msg = sprintf(
+                _('User %s (%s) now has an active account.'),
+                $this->userData['fullname'],
+                $this->userData['email']
+            );
         } else {
             $msg = Tools::error();
         }
@@ -753,6 +754,7 @@ class Users extends Auth
         $Email = new Email($this->Config);
 
         // now let's get the URL so we can have a nice link in the email
+        $Request = Request::createFromGlobals();
         $url = 'https://' . $Request->getHttpHost() . '/login.php';
         // we send an email to each validated new user
         $footer = "\n\n~~~\nSent from eLabFTW https://www.elabftw.net\n";
@@ -764,9 +766,9 @@ class Users extends Auth
         // Set the From address with an associative array
         ->setFrom(array($this->Config->configArr['mail_from'] => 'eLabFTW'))
         // Set the To addresses with an associative array
-        ->setTo(array($userArr['email'] => 'eLabFTW'))
+        ->setTo(array($this->userData['email'] => 'eLabFTW'))
         // Give it a body
-        ->setBody('Hello. Your account on eLabFTW was validated by an admin. Follow this link to login : ' . $url . $footer);
+        ->setBody('Hello. Your account on eLabFTW was validated by an admin. Follow this link to login: ' . $url . $footer);
         // generate Swift_Mailer instance
         $mailer = $Email->getMailer();
         // now we try to send the email
