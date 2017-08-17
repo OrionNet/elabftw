@@ -11,6 +11,7 @@
 namespace Elabftw\Elabftw;
 
 use Symfony\Component\HttpFoundation\Cookie;
+use Symfony\Component\HttpFoundation\Session\Session;
 
 /**
  * Provide methods to login a user
@@ -109,12 +110,14 @@ class Auth
             }
         }
 
-        session_regenerate_id();
-        $_SESSION['auth'] = 1;
-        $_SESSION['userid'] = $this->userData['userid'];
-        $_SESSION['team_id'] = $this->userData['team'];
-        // Used in the menu
-        $_SESSION['firstname'] = $this->userData['firstname'];
+        $Session = new Session();
+        $Session->migrate();
+        $Session->set('auth', 1);
+        $Session->set('userid', $this->userData['userid']);
+        // TODO move to team
+        $Session->set('team_id', $this->userData['team']);
+        $Session->set('firstname', $this->userData['firstname']);
+
         // load permissions
         $perm_sql = "SELECT * FROM groups WHERE group_id = :group_id LIMIT 1";
         $perm_req = $this->pdo->prepare($perm_sql);
@@ -122,14 +125,12 @@ class Auth
         $perm_req->execute();
         $group = $perm_req->fetch(\PDO::FETCH_ASSOC);
 
-        $_SESSION['is_admin'] = $group['is_admin'];
-        $_SESSION['is_sysadmin'] = $group['is_sysadmin'];
-
+        $Session->set('is_admin', $group['is_admin']);
+        $Session->set('is_sysadmin', $group['is_sysadmin']);
         // Make a unique token and store it in sql AND cookie
         $this->token = md5(uniqid(rand(), true));
         // and SESSION
-        $_SESSION['token'] = $this->token;
-        session_write_close();
+        $Session->set('token', $this->token);
         return true;
     }
 

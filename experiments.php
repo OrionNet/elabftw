@@ -24,7 +24,7 @@ try {
     require_once 'app/head.inc.php';
 
     if (!isset($Users)) {
-        $Users = new Users($_SESSION['userid']);
+        $Users = new Users($Session->get('userid'));
     }
 
     $EntityView = new ExperimentsView(new Experiments($Users));

@@ -60,11 +60,15 @@ try {
             $Logs = new Logs();
             $Logs->create('Warning', $_SERVER['REMOTE_ADDR'], 'Failed login attempt');
             // inform the user
-            $_SESSION['ko'][] = _("Login failed. Either you mistyped your password or your account isn't activated yet.");
-            if (!isset($_SESSION['failed_attempt'])) {
-                $_SESSION['failed_attempt'] = 1;
+            $Session->getFlashBag()->add('ko', _("Login failed. Either you mistyped your password or your account isn't activated yet."));
+            var_dump($Session->all());
+            if (!$Session->has('failed_attempt')) {
+                $Session->set('failed_attempt', 1);
             } else {
-                $_SESSION['failed_attempt'] += 1;
+                $n = $Session->get('failed_attempt');
+                $n += 1;
+                //$Session->set('failed_attempt', $Session->get('failed_attempt') + 1);
+                $Session->set('failed_attempt', $n);
             }
         }
     }

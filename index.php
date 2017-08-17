@@ -14,8 +14,6 @@ namespace Elabftw\Elabftw;
 use Exception;
 use OneLogin_Saml2_Auth;
 
-session_start();
-
 try {
     if (isset($_GET['acs'])) {
 

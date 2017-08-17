@@ -50,15 +50,15 @@ try {
     }
 
     if ($Users->needValidation) {
-        $_SESSION['ok'][] = _('Registration successful :)<br>Your account must now be validated by an admin.<br>You will receive an email when it is done.');
+        $Session->getFlashBag()->add('ok', _('Registration successful :)<br>Your account must now be validated by an admin.<br>You will receive an email when it is done.'));
     } else {
-        $_SESSION['ok'][] = _('Registration successful :)<br>Welcome to eLabFTW o/');
+        $Session->getFlashBag()->add('ok', _('Registration successful :)<br>Welcome to eLabFTW o/'));
     }
     // store the email here so we can put it in the login field
-    $_SESSION['email'] = $Request->request->get('email');
+    $Session->set('email', $Request->request->get('email'));
 
 } catch (Exception $e) {
-    $_SESSION['ko'][] = $e->getMessage();
+    $Session->getFlashBag()->add('ko', $e->getMessage());
     $location = '../../register.php';
 
 } finally {
