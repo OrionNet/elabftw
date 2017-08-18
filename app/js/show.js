@@ -24,7 +24,7 @@ $(document).ready(function(){
             'type' : $(this).data('type')
         // and put it in the div and show the div
         }).done(function(data) {
-            $('#bodyToggle_' + id).html(data.body);
+            $('#bodyToggle_' + id).html(data.msg);
             $('#bodyToggle_' + id).toggle();
 
         });

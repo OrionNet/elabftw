@@ -75,6 +75,19 @@ try {
      *
      */
 
+    // GET BODY
+    if ($Request->request->has('getBody')) {
+        $permissions = $Entity->getPermissions();
+        if ($permissions['read'] === false) {
+            throw new Exception(Tools::error(true));
+        }
+        $Response->setData(array(
+            'res' => true,
+            'msg' => $Entity->entityData['body']
+        ));
+    }
+
+
     // UPDATE
     if ($Request->request->has('update')) {
         $Entity->canOrExplode('write');

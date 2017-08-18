@@ -98,7 +98,7 @@ class Auth
     private function populateSession($email = null)
     {
         if ($email !== null) {
-            $sql = "SELECT * FROM users WHERE email = :email AND validated = 1";
+            $sql = "SELECT * FROM users WHERE email = :email";
             $req = $this->pdo->prepare($sql);
             $req->bindParam(':email', $email);
             //Check whether the query was successful or not
@@ -114,7 +114,6 @@ class Auth
         $Session->migrate();
         $Session->set('auth', 1);
         $Session->set('userid', $this->userData['userid']);
-        // TODO move to team
         $Session->set('team', $this->userData['team']);
         $Session->set('firstname', $this->userData['firstname']);
 

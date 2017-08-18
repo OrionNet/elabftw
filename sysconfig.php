@@ -110,13 +110,13 @@ try {
         'idpsArr' => $idpsArr,
         'phpInfos' => $phpInfos,
         'logsArr' => $logsArr,
-        'session' => $_SESSION,
+        'Session' => $Session,
         'teamsArr' => $teamsArr,
         'usersArr' => $usersArr
     ));
 
 } catch (Exception $e) {
-    $Logs->create('Error', $_SESSION['userid'], $e->getMessage());
+    $Logs->create('Error', $Session->get('userid'), $e->getMessage());
     echo Tools::displayMessage($e->getMessage(), 'ko');
 } finally {
     require_once 'app/footer.inc.php';
