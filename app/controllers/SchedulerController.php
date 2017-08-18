@@ -23,6 +23,9 @@ try {
     $Scheduler = new Scheduler($Database);
     $Response = new JsonResponse();
 
+    $res = false;
+    $msg = Tools::error();
+
     // CREATE
     if ($Request->request->has('create')) {
         $Database->setId($Request->request->get('item'));
@@ -31,15 +34,8 @@ try {
             $Request->request->get('end'),
             $Request->request->get('title')
         )) {
-            $Response->setData(array(
-                'res' => true,
-                'msg' => _('Saved')
-            ));
-        } else {
-            $Response->setData(array(
-                'res' => false,
-                'msg' => Tools::error()
-            ));
+            $res = true;
+            $msg = _('Saved');
         }
     }
 
@@ -47,62 +43,42 @@ try {
     if ($Request->request->has('read')) {
         $Database->setId($Request->request->get('item'));
         $Response->setData($Scheduler->read());
+        $Response->send();
+        exit;
     }
 
     // UPDATE START
     if ($Request->request->has('updateStart')) {
         $Scheduler->setId($Request->request->get('id'));
         if ($Scheduler->updateStart($Request->request->get('start'), $Request->request->get('end'))) {
-            $Response->setData(array(
-                'res' => true,
-                'msg' => _('Saved')
-            ));
-        } else {
-            $Response->setData(array(
-                'res' => false,
-                'msg' => Tools::error()
-            ));
+            $res = true;
+            $msg = _('Saved');
         }
     }
     // UPDATE END
     if ($Request->request->has('updateEnd')) {
         $Scheduler->setId($Request->request->get('id'));
         if ($Scheduler->updateEnd($Request->request->get('end'))) {
-            $Response->setData(array(
-                'res' => true,
-                'msg' => _('Saved')
-            ));
-        } else {
-            $Response->setData(array(
-                'res' => false,
-                'msg' => Tools::error()
-            ));
+            $res = true;
+            $msg = _('Saved');
         }
     }
     // DESTROY
     if ($Request->request->has('destroy')) {
         $Scheduler->setId($Request->request->get('id'));
         $eventArr = $Scheduler->readFromId();
-        if ($eventArr['userid'] != $Session->get('userid')) {
-            $Response->setData(array(
-                'res' => false,
-                'msg' => Tools::error(true)
-            ));
-        } else {
+        if ($eventArr['userid'] == $Session->get('userid')) {
             if ($Scheduler->destroy()) {
-                $Response->setData(array(
-                    'res' => true,
-                    'msg' => _('Event deleted successfully')
-                ));
-            } else {
-                $Response->setData(array(
-                    'res' => false,
-                    'msg' => Tools::error()
-                ));
+                $res = true;
+                $msg = _('Event deleted successfully');
             }
         }
     }
 
+    $Response->setData(array(
+        'res' => $res,
+        'msg' => $msg
+    ));
     $Response->send();
 
 } catch (Exception $e) {
