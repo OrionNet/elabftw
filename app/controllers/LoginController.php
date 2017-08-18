@@ -69,7 +69,7 @@ try {
                 $Session->set('failed_attempt', 1);
             } else {
                 $n = $Session->get('failed_attempt');
-                $n += 1;
+                $n++;
                 $Session->set('failed_attempt', $n);
             }
         }

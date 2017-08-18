@@ -70,9 +70,9 @@ class Scheduler extends Entity
     }
 
     /**
-     * Return a JSON string with events for this item
+     * Return an array with events for this item
      *
-     * @return string JSON
+     * @return array
      */
     public function read()
     {

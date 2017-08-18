@@ -797,7 +797,7 @@ class Users extends Auth
         // check the user is in our team and also get the userid
         $useridToDelete = $this->emailInTeam($email, $this->userData['team']);
 
-        if (!$useridToDelete) {
+        if (Tools::checkId($useridToDelete) === false) {
             throw new Exception(_('No user with this email or user not in your team'));
         }
 
