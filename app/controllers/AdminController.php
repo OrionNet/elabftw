@@ -11,6 +11,7 @@
 namespace Elabftw\Elabftw;
 
 use Exception;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
  * Deal with ajax requests sent from the admin page
@@ -25,25 +26,27 @@ try {
         throw new Exception('Non admin user tried to access admin panel.');
     }
 
+    $Response = new JsonResponse();
+
     // UPDATE ORDERING
     if ($Request->request->has('updateOrdering')) {
-        if ($_POST['table'] === 'status') {
+        if ($Request->request->get('table') === 'status') {
             $Entity = new Status($Users);
-        } elseif ($_POST['table'] === 'items_types') {
+        } elseif ($Request->request->get('table') === 'items_types') {
             $Entity = new ItemsTypes($Users);
-        } elseif ($_POST['table'] === 'experiments_templates') {
+        } elseif ($Request->request->get('table') === 'experiments_templates') {
             // remove the create new entry
-            unset($_POST['ordering'][0]);
+            unset($Request->request->get('ordering')[0]);
             $Entity = new Templates($Users);
         }
 
         if ($Entity->updateOrdering($_POST)) {
-            echo json_encode(array(
+            $Response->setData(array(
                 'res' => true,
                 'msg' => _('Saved')
             ));
         } else {
-            echo json_encode(array(
+            $Response->setData(array(
                 'res' => false,
                 'msg' => Tools::error()
             ));
@@ -54,10 +57,10 @@ try {
     if ($Request->request->has('teamsUpdateFull')) {
         $redirect = true;
         $Teams = new Teams($Session->get('team'));
-        if ($Teams->update($_POST)) {
-            $_SESSION['ok'][] = _('Configuration updated successfully.');
+        if ($Teams->update($Request->request->all())) {
+            $Session->getFlashBag()->add('ok', _('Configuration updated successfully.'));
         } else {
-            $_SESSION['ko'][] = _('An error occurred!');
+            $Session->getFlashBag()->add('ko', Tools::error());
         }
     }
 

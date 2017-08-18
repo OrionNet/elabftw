@@ -21,7 +21,7 @@ $actionTarget = 'experiments.php';
 $teamConfigArr = array();
 
 if ($Session->has('auth')) {
-    $Teams = new Teams($Session->get('team_id'));
+    $Teams = new Teams($Session->get('team'));
     $teamConfigArr = $Teams->read();
 
     // to redirect to the right page
@@ -30,8 +30,8 @@ if ($Session->has('auth')) {
     }
 
     $getQ = '';
-    if (isset($_GET['q'])) {
-        $getQ = filter_var($_GET['q'], FILTER_SANITIZE_STRING);
+    if ($Request->query->has('q')) {
+        $getQ = $Request->query->filter('q', null, FILTER_SANITIZE_STRING);
     }
 }
 
