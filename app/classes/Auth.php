@@ -115,7 +115,7 @@ class Auth
         $Session->set('auth', 1);
         $Session->set('userid', $this->userData['userid']);
         // TODO move to team
-        $Session->set('team_id', $this->userData['team']);
+        $Session->set('team', $this->userData['team']);
         $Session->set('firstname', $this->userData['firstname']);
 
         // load permissions

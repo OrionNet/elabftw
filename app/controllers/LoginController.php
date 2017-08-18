@@ -19,7 +19,7 @@ try {
     // default location for redirect
     $location = '../../login.php';
 
-    $formKey = new FormKey();
+    $FormKey = new FormKey($Session);
     $Auth = new Auth();
     $Saml = new Saml(new Config, new Idps);
 
@@ -33,7 +33,7 @@ try {
     } else {
 
         // FORMKEY
-        if (!$Request->request->has('formkey') || !$formKey->validate()) {
+        if (!$Request->request->has('formkey') || !$FormKey->validate($Request->request->get('formkey'))) {
             throw new Exception(_("Your session expired. Please retry."));
         }
 
@@ -60,7 +60,10 @@ try {
             $Logs = new Logs();
             $Logs->create('Warning', $_SERVER['REMOTE_ADDR'], 'Failed login attempt');
             // inform the user
-            $Session->getFlashBag()->add('ko', _("Login failed. Either you mistyped your password or your account isn't activated yet."));
+            $Session->getFlashBag()->add(
+                'ko',
+                _("Login failed. Either you mistyped your password or your account isn't activated yet.")
+            );
             var_dump($Session->all());
             if (!$Session->has('failed_attempt')) {
                 $Session->set('failed_attempt', 1);
@@ -74,7 +77,7 @@ try {
     }
 
 } catch (Exception $e) {
-    $_SESSION['ko'][] = $e->getMessage();
+    $Session->getFlashBag()->add('ko', $e->getMessage());
 
 } finally {
     header("location: $location");

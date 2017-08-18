@@ -29,7 +29,7 @@ try {
 
     $Config = new Config();
     $Idps = new Idps();
-    $FormKey = new FormKey();
+    $FormKey = new FormKey($Session);
     $BannedUsers = new BannedUsers($Config);
 
     // if we are not in https, die saying we work only in https

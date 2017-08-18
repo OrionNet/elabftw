@@ -23,7 +23,7 @@ try {
     $pageTitle = _('eLabFTW Configuration');
     require_once 'app/head.inc.php';
 
-    if ($_SESSION['is_sysadmin'] != 1) {
+    if ($Session->get('is_sysadmin') != 1) {
         throw new Exception(_('This section is out of your reach.'));
     }
 

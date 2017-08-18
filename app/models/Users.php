@@ -791,15 +791,13 @@ class Users extends Auth
     public function destroy($email, $password)
     {
         // check that we got the good password
-        $me = $this->read($_SESSION['userid']);
-        if (!$this->checkCredentials($me['email'], $password)) {
+        if (!$this->checkCredentials($this->userData['email'], $password)) {
             throw new Exception(_("Wrong password!"));
         }
         // check the user is in our team and also get the userid
-        $useridArr = $this->emailInTeam($email, $_SESSION['team_id']);
-        $userid = $useridArr['userid'];
+        $useridToDelete = $this->emailInTeam($email, $this->userData['team']);
 
-        if (!$userid) {
+        if (!$useridToDelete) {
             throw new Exception(_('No user with this email or user not in your team'));
         }
 
@@ -807,24 +805,24 @@ class Users extends Auth
 
         $sql = "DELETE FROM users WHERE userid = :userid";
         $req = $this->pdo->prepare($sql);
-        $req->bindParam(':userid', $userid, PDO::PARAM_INT);
+        $req->bindParam(':userid', $useridToDelete);
         $result[] = $req->execute();
 
         $sql = "DELETE FROM experiments_tags WHERE userid = :userid";
         $req = $this->pdo->prepare($sql);
-        $req->bindParam(':userid', $userid, PDO::PARAM_INT);
+        $req->bindParam(':userid', $useridToDelete);
         $result[] = $req->execute();
 
         $sql = "DELETE FROM experiments WHERE userid = :userid";
         $req = $this->pdo->prepare($sql);
-        $req->bindParam(':userid', $userid, PDO::PARAM_INT);
+        $req->bindParam(':userid', $useridToDelete);
         $result[] = $req->execute();
 
         // get all filenames
         $sql = "SELECT long_name FROM uploads WHERE userid = :userid AND type = :type";
         $req = $this->pdo->prepare($sql);
         $req->execute(array(
-            'userid' => $userid,
+            'userid' => $useridToDelete,
             'type' => 'experiments'
         ));
         while ($uploads = $req->fetch()) {
@@ -835,7 +833,7 @@ class Users extends Auth
 
         $sql = "DELETE FROM uploads WHERE userid = :userid";
         $req = $this->pdo->prepare($sql);
-        $req->bindParam(':userid', $userid, PDO::PARAM_INT);
+        $req->bindParam(':userid', $useridToDelete);
         $result[] = $req->execute();
 
         return !in_array(0, $result);
@@ -846,17 +844,17 @@ class Users extends Auth
      *
      * @param string $email
      * @param int $team
-     * @return int|bool
+     * @return string|null
      */
     private function emailInTeam($email, $team)
     {
-        $sql = "SELECT userid FROM users WHERE email LIKE :email AND team = :team";
+        $sql = "SELECT userid FROM users WHERE email = :email AND team = :team";
         $req = $this->pdo->prepare($sql);
         $req->bindParam(':email', $email);
         $req->bindParam(':team', $team);
         $req->execute();
 
-        return $req->fetch();
+        return $req->fetchColumn();
     }
 
     /**
@@ -867,11 +865,6 @@ class Users extends Auth
      */
     public function promoteSysadmin($email)
     {
-        // only sysadmin can do that
-        if (!$_SESSION['is_sysadmin']) {
-            throw new Exception(Tools::error(true));
-        }
-
         // check we have a valid email
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             throw new Exception('Email malformed');

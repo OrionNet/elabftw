@@ -21,12 +21,12 @@ try {
 
     $redirect = false;
 
-    if (!$_SESSION['is_admin']) {
+    if (!$Session->get('is_admin')) {
         throw new Exception('Non admin user tried to access admin panel.');
     }
 
     // UPDATE ORDERING
-    if (isset($_POST['updateOrdering'])) {
+    if ($Request->request->has('updateOrdering')) {
         if ($_POST['table'] === 'status') {
             $Entity = new Status($Users);
         } elseif ($_POST['table'] === 'items_types') {
@@ -51,9 +51,9 @@ try {
     }
 
     // UPDATE TEAM SETTINGS
-    if (isset($_POST['teamsUpdateFull'])) {
+    if ($Request->request->has('teamsUpdateFull')) {
         $redirect = true;
-        $Teams = new Teams($_SESSION['team_id']);
+        $Teams = new Teams($Session->get('team'));
         if ($Teams->update($_POST)) {
             $_SESSION['ok'][] = _('Configuration updated successfully.');
         } else {
@@ -62,18 +62,18 @@ try {
     }
 
     // CLEAR STAMP PASS
-    if (isset($_GET['clearStamppass']) && $_GET['clearStamppass'] === '1') {
+    if ($Request->request->get('clearStamppass')) {
         $redirect = true;
-        $Teams = new Teams($_SESSION['team_id']);
+        $Teams = new Teams($Session->get('team'));
         if (!$Teams->destroyStamppass()) {
             throw new Exception('Error clearing the timestamp password');
         }
     }
 
     // UPDATE COMMON TEMPLATE
-    if (isset($_POST['commonTplUpdate'])) {
+    if ($Request->request->has('commonTplUpdate')) {
         $Templates = new Templates($Users);
-        $Templates->updateCommon($_POST['commonTplUpdate']);
+        $Templates->updateCommon($Request->request->get('commonTplUpdate'));
     }
 
     if ($redirect) {
@@ -82,5 +82,5 @@ try {
 
 } catch (Exception $e) {
     $Logs = new Logs();
-    $Logs->create('Error', $_SESSION['userid'], $e->getMessage());
+    $Logs->create('Error', $Session->get('userid'), $e->getMessage());
 }
