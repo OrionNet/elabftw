@@ -61,9 +61,11 @@ $(document).ready(function(){
     });
 
     // TITLE CLICK
+    /*
     $('.title').on('click', function() {
         window.location.href = '?mode=view&id=' + $(this).data('id');
     });
+    */
 
     // THE CHECKBOXES
     function getCheckedBoxes() {
