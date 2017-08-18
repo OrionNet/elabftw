@@ -95,9 +95,11 @@ try {
     // run the update script if we have the wrong schema version
     if ($Update->Config->configArr['schema'] < $Update::REQUIRED_SCHEMA) {
         try {
-            $Session->set('ok')[] = $Update->runUpdateScript();
+            foreach ($Update->runUpdateScript() as $msg) {
+                $Session->getFlashBag()->add('ok', $msg);
+            }
         } catch (Exception $e) {
-            $Session->set('ko')[] = 'Error updating: ' . $e->getMessage();
+            $Session->getFlashBag()->add('ko', 'Error updating: ' . $e->getMessage());
         }
     }
 
