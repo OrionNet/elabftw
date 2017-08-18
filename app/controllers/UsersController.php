@@ -11,6 +11,7 @@
 namespace Elabftw\Elabftw;
 
 use Exception;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
  * Users infos from admin page
@@ -22,27 +23,29 @@ try {
 
     $FormKey = new FormKey($Session);
 
+    $tab = 1;
+    $location = '../../admin.php?tab=' . $tab;
+
     // (RE)GENERATE AN API KEY (from profile)
-    if (isset($_POST['generateApiKey'])) {
+    if ($Request->request->has('generateApiKey')) {
+        $Response = new JsonResponse();
         $redirect = false;
         if ($Users->generateApiKey()) {
-            echo json_encode(array(
+            $Response->setData(array(
                 'res' => true,
                 'msg' => _('Saved')
             ));
         } else {
-            echo json_encode(array(
+            $Response->setData(array(
                 'res' => false,
                 'msg' => Tools::error()
             ));
         }
+        $Response->send();
     }
 
-    $tab = 1;
-    $location = '../../admin.php?tab=' . $tab;
-
     // VALIDATE
-    if (isset($_POST['usersValidate'])) {
+    if ($Request->request->has('usersValidate')) {
         $tab = 2;
         if (!$Session->get('is_admin')) {
             throw new Exception('Non admin user tried to access admin panel.');
@@ -55,7 +58,7 @@ try {
     }
 
     // UPDATE USERS
-    if (isset($_POST['usersUpdate'])) {
+    if ($Request->request->has('usersUpdate')) {
         $tab = 2;
         if (!$Session->get('is_admin')) {
             throw new Exception('Non admin user tried to access admin panel.');
@@ -66,7 +69,7 @@ try {
             $location = "../../admin.php?tab=$tab";
         }
 
-        if ($Users->update($_POST)) {
+        if ($Users->update($Request->request->all())) {
             $Session->getFlashBag()->add('ok', _('Configuration updated successfully.'));
         }
     }

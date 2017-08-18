@@ -33,8 +33,8 @@ try {
     if ($Request->request->has('teamGroupUpdateName')) {
         // the output is echoed so it gets back into jeditable input field
         echo $TeamGroups->update(
-            filter_var($_POST['teamGroupUpdateName'], FILTER_SANITIZE_STRING),
-            $_POST['id']
+            $Request->request->filter('teamGroupUpdateName', null, FILTER_SANITIZE_STRING),
+            $Request->request->get('id')
         );
     }
 

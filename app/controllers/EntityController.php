@@ -87,6 +87,32 @@ try {
         ));
     }
 
+    // LOCK
+    if ($Request->request->has('lock')) {
+        $permissions = $Entity->getPermissions();
+        // We don't have can_lock, but maybe it's our XP, so we can lock it
+        if (!$Users->userData['can_lock'] && !$permissions['write']) {
+            throw new Exception(_("You don't have the rights to lock/unlock this."));
+        }
+        $errMsg = Tools::error();
+        $res = null;
+        try {
+            $res = $Entity->toggleLock();
+        } catch (Exception $e) {
+            $errMsg = $e->getMessage();
+        }
+        if ($res) {
+            $Response->setData(array(
+                'res' => true,
+                'msg' => _('Saved')
+            ));
+        } else {
+            $Response->setData(array(
+                'res' => false,
+                'msg' => $errMsg
+            ));
+        }
+    }
 
     // UPDATE
     if ($Request->request->has('update')) {
