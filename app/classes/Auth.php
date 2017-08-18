@@ -90,7 +90,7 @@ class Auth
     }
 
     /**
-     * Store userid and permissions in $_SESSION
+     * Store userid and permissions in session
      *
      * @param string|null $email
      * @return bool
@@ -128,7 +128,7 @@ class Auth
         $Session->set('is_sysadmin', $group['is_sysadmin']);
         // Make a unique token and store it in sql AND cookie
         $this->token = md5(uniqid(rand(), true));
-        // and SESSION
+        // and session
         $Session->set('token', $this->token);
         return true;
     }

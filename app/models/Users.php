@@ -20,16 +20,16 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class Users extends Auth
 {
-    /** instance of Config */
+    /** @var Config $Config instance of Config */
     public $Config;
 
-    /** flag to check if we need validation or not */
+    /** @var bool $needValidation flag to check if we need validation or not */
     public $needValidation = false;
 
-    /** what you get when you read() */
+    /** @var array $userData what you get when you read() */
     public $userData;
 
-    /** our userid */
+    /** @var string $userid our userid */
     public $userid;
 
     /**
@@ -314,7 +314,8 @@ class Users extends Auth
      */
     public function read($userid)
     {
-        $sql = "SELECT users.*, CONCAT(users.firstname, ' ', users.lastname) AS fullname, groups.can_lock FROM users
+        $sql = "SELECT users.*, CONCAT(users.firstname, ' ', users.lastname) AS fullname,
+            groups.can_lock, groups.is_admin, groups.is_sysadmin FROM users
             LEFT JOIN groups ON groups.group_id = users.usergroup
             WHERE users.userid = :userid";
         $req = $this->pdo->prepare($sql);
@@ -448,7 +449,7 @@ class Users extends Auth
         }
 
         // a non sysadmin cannot put someone sysadmin
-        if ($usergroup == 1 && $_SESSION['is_sysadmin'] != 1) {
+        if ($usergroup == 1 && $this->userData['is_sysadmin'] != 1) {
             throw new Exception(_('Only a sysadmin can put someone sysadmin.'));
         }
 
@@ -686,7 +687,7 @@ class Users extends Auth
     {
 
         if (is_null($userid)) {
-            $userid = $_SESSION['userid'];
+            $userid = $this->userid;
         }
 
         if (!$this->checkPasswordLength($password)) {

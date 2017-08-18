@@ -56,7 +56,7 @@ try {
 
     // i18n (gettext)
     if ($Session->has('auth')) {
-        $Users = new Users($Session->get('userid'));
+        $Users = new Users($Session->get('userid'), new Config());
         $locale = $Users->userData['lang'] . '.utf8';
     } else {
         $locale = $Update->Config->configArr['lang'] . '.utf8';
