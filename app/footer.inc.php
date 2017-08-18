@@ -9,18 +9,17 @@
  */
 namespace Elabftw\Elabftw;
 
-$Users = new Users();
-
 if ($Session->has('auth')) {
     // todolist
     $Todolist = new Todolist($Session->get('userid'));
-    $Users->setId($Session->get('userid'));
     $todoItems = $Todolist->readAll();
 
     echo $Twig->render('todolist.html', array(
         'Users' => $Users,
         'todoItems' => $todoItems
     ));
+} else {
+    $Users = null;
 }
 
 // show some stats about generation time and number of SQL queries
