@@ -84,7 +84,9 @@ try {
             $Request->request->get('date'),
             $Request->request->get('body')
         )) {
-            $Response = new RedirectResponse("../../" . $Entity::PAGE . ".php?mode=view&id=" . $Request->request->get('id'));
+            $Response = new RedirectResponse(
+                "../../" . $Entity::PAGE . ".php?mode=view&id=" . $Request->request->get('id')
+            );
         } else {
             throw new Exception('Error during save.');
         }
@@ -271,5 +273,5 @@ try {
 
 } catch (Exception $e) {
     $Logs = new Logs();
-    $Logs->create('Error', $_SESSION['userid'], $e->getMessage());
+    $Logs->create('Error', $Session->get('userid'), $e->getMessage());
 }

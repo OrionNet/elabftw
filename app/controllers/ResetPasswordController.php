@@ -14,6 +14,7 @@ use Swift_Message;
 use Exception;
 use Defuse\Crypto\Crypto as Crypto;
 use Defuse\Crypto\Key as Key;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 try {
     require_once '../../app/init.inc.php';
@@ -77,7 +78,7 @@ try {
             throw new Exception(_('There was a problem sending the email! Error was logged.'));
         }
 
-        $_SESSION['ok'][] = _('Email sent. Check your INBOX.');
+        $Session->getFlashBag()->add('ok', _('Email sent. Check your INBOX.'));
     }
 
     // second part, update the password
@@ -104,14 +105,15 @@ try {
         }
 
         $Logs->create('Info', $Users->userData['email'], 'Password was changed for this user.');
-        $_SESSION['ok'][] = _('New password inserted. You can now login.');
+        $Session->getFlashBag()->add('ok', _('New password inserted. You can now login.'));
     }
 
 } catch (Exception $e) {
     // log the error
     $Logs = new Logs();
-    $Logs->create('Error', $_SERVER['REMOTE_ADDR'], $e->getMessage());
-    $_SESSION['ko'][] = $e->getMessage();
+    $Logs->create('Error', $Request->server->get('REMOTE_ADDR'), $e->getMessage());
+    $Session->getFlashBag()->add('ko', $e->getMessage());
 } finally {
-    header("location: ../../login.php");
+    $Response = new RedirectResponse("../../login.php");
+    $Response->send();
 }

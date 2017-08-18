@@ -12,6 +12,7 @@ namespace Elabftw\Elabftw;
 
 use Exception;
 use OneLogin_Saml2_Auth;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 try {
     require_once '../init.inc.php';
@@ -64,13 +65,11 @@ try {
                 'ko',
                 _("Login failed. Either you mistyped your password or your account isn't activated yet.")
             );
-            var_dump($Session->all());
             if (!$Session->has('failed_attempt')) {
                 $Session->set('failed_attempt', 1);
             } else {
                 $n = $Session->get('failed_attempt');
                 $n += 1;
-                //$Session->set('failed_attempt', $Session->get('failed_attempt') + 1);
                 $Session->set('failed_attempt', $n);
             }
         }
@@ -80,5 +79,6 @@ try {
     $Session->getFlashBag()->add('ko', $e->getMessage());
 
 } finally {
-    header("location: $location");
+    $Response = new RedirectResponse($location);
+    $Response->send();
 }

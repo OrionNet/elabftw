@@ -11,6 +11,7 @@
 namespace Elabftw\Elabftw;
 
 use Exception;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 try {
     require_once '../init.inc.php';
@@ -30,22 +31,23 @@ try {
         throw new Exception('Only humans can register an account!');
     }
 
-    if (!isset($_POST['team']) ||
-        empty($_POST['team']) ||
-        (Tools::checkId($_POST['team']) === false) ||
-        !isset($_POST['firstname']) ||
-        empty($_POST['firstname']) ||
-        !isset($_POST['lastname']) ||
-        empty($_POST['lastname']) ||
-        !isset($_POST['email']) ||
-        empty($_POST['email']) ||
-        !filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
+    if ((Tools::checkId($Request->request->get('team')) === false) ||
+        !$Request->request->get('firstname') ||
+        !$Request->request->get('lastname') ||
+        !$Request->request->get('email') ||
+        !filter_var($Request->request->get('email'), FILTER_VALIDATE_EMAIL)) {
 
         throw new Exception(_('A mandatory field is missing!'));
     }
 
     // Check whether the query was successful or not
-    if (!$Users->create($_POST['email'], $_POST['team'], $_POST['firstname'], $_POST['lastname'], $_POST['password'])) {
+    if (!$Users->create(
+        $Request->request->get('email'),
+        $Request->request->get('team'),
+        $Request->request->get('firstname'),
+        $Request->request->get('lastname'),
+        $Request->request->get('password')
+    )) {
         throw new Exception('Failed inserting new account in SQL!');
     }
 
@@ -62,5 +64,6 @@ try {
     $location = '../../register.php';
 
 } finally {
-    header("location: $location");
+    $Response = new RedirectResponse($location);
+    $Response->send();
 }

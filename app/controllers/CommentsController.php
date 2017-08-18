@@ -23,54 +23,41 @@ try {
     $Comments = new Comments(new Experiments($Users));
     $Response = new JsonResponse();
 
+    $res = false;
+    $msg = Tools::error();
+
     // CREATE
     if ($Request->request->has('create')) {
         $Comments->Entity->setId($Request->request->get('id'));
         if ($Comments->create($Request->request->get('comment'))) {
-            $Response->setData(array(
-                'res' => true,
-                'msg' => _('Saved')
-            ));
-        } else {
-            $Response->setData(array(
-                'res' => false,
-                'msg' => Tools::error()
-            ));
+            $res = true;
+            $msg = _('Saved');
         }
     }
 
     // UPDATE
     if ($Request->request->has('update')) {
         if ($Comments->update($Request->request->get('commentsUpdate'), $Request->request->get('id'))) {
-            $Response->setData(array(
-                'res' => true,
-                'msg' => _('Saved')
-            ));
-        } else {
-            $Response->setData(array(
-                'res' => false,
-                'msg' => Tools::error()
-            ));
+            $res = true;
+            $msg = _('Saved');
         }
     }
 
     // DESTROY
     if ($Request->request->has('destroy')) {
-        if ($Comments->destroy($Request->request->get('id'), $_SESSION['userid'])) {
-            $Response->setData(array(
-                'res' => true,
-                'msg' => _('Comment successfully deleted')
-            ));
-        } else {
-            $Response->setData(array(
-                'res' => false,
-                'msg' => Tools::error()
-            ));
+        if ($Comments->destroy($Request->request->get('id'), $Session->get('userid'))) {
+            $res = true;
+            $msg = _('Comment successfully deleted');
         }
     }
+
+    $Response->setData(array(
+        'res' => $res,
+        'msg' => $msg
+    ));
     $Response->send();
 
 } catch (Exception $e) {
     $Logs = new Logs();
-    $Logs->create('Error', $_SESSION['userid'], $e->getMessage());
+    $Logs->create('Error', $Session->get('userid'), $e->getMessage());
 }
