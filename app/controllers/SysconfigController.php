@@ -68,7 +68,7 @@ try {
 
     // DESTROY TEAM
     if ($Request->request->has('teamsDestroy')) {
-        if ($Teams->destroy($_POST['teamsDestroyId'])) {
+        if ($Teams->destroy($Request->request->get('teamsDestroyId'))) {
             $res = true;
             $msg = _('Saved');
         }
@@ -77,7 +77,7 @@ try {
     // SEND TEST EMAIL
     if ($Request->request->has('testemailSend')) {
         $Sysconfig = new Sysconfig(new Email($Config));
-        if ($Sysconfig->testemailSend($_POST['testemailEmail'])) {
+        if ($Sysconfig->testemailSend($Request->request->get('testemailEmail'))) {
             $res = true;
             $msg = _('Email sent');
         }
@@ -86,7 +86,7 @@ try {
     // SEND MASS EMAIL
     if ($Request->request->has('massEmail')) {
         $Sysconfig = new Sysconfig(new Email($Config));
-        if ($Sysconfig->massEmail($_POST['subject'], $_POST['body'])) {
+        if ($Sysconfig->massEmail($Request->request->get('subject'), $Request->request->get('body'))) {
             $res = true;
             $msg = _('Email sent');
         }
