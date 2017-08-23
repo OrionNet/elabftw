@@ -139,11 +139,11 @@ class MakePdf extends AbstractMake
         }
 
         $html .= "<section class='no-break'>";
-        if ($linkNb === 1) {
-            $html .= "<h3>Linked item:</h3>";
-        } else {
-            $html .= "<h3>Linked items:</h3>";
+        $html .= "<h3>Linked item";
+        if (count($linksArr) > 1) {
+            $html .= 's';
         }
+        $html .= ":</h3>";
         // add the item with a link
 
         // create Request object
